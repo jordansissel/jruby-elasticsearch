@@ -13,22 +13,22 @@ class ElasticSearch::Client
     @client = @node.client
   end
 
-  def index(index, type, id=nil, &block)
-    indexreq = ElasticSearch::IndexRequest.new(@client, index, type, id)
-    indexreq.instance_eval(&block)
+  def index(index, type, id=nil, data={}, &block)
+    indexreq = ElasticSearch::IndexRequest.new(@client, index, type, id, data)
+    if block_given?
+      indexreq.instance_eval(&block)
+    end
     return indexreq
   end
-
 end
 
 class ElasticSearch::IndexRequest
-  def initialize(client, index, type, id=nil)
+  def initialize(client, index, type, id=nil, data={})
     @client = client
     @index = index
     @type = type
     @id = id
-    @data = {}
-
+    @data = data
     @indexprep = @client.prepareIndex(index, type, id)
   end
 
@@ -54,8 +54,19 @@ req = client.index("twitter", "tweet") do
   hello "world"
   foo "bar"
 end
+req.execute
 
-p req.execute do
-  puts "OK"
+
+start = Time.now
+1.upto(80000) do  |i|
+  if i % 500 == 0
+    puts "#{i}: Duration: #{Time.now - start}"
+    start = Time.now
+  end
+  req2 = client.index("twitter", "fizzle2", nil, {
+    "hello" => "world",
+    "number" => rand(5000)
+  })
+  req2.execute
 end
-#p req.execute.actionGet()
+puts "Duration: #{Time.now - start}"
