@@ -17,9 +17,9 @@ DSL Example ideas:
 
 Non-DSL Example:
 
-  #                  <index  >, <type   >, <id>, <data>
-  req = client.index("twitter", "fizzle2", nil, {
-    "hello" => "world",
-    "number" => rand(5000)
-  })
-  req.execute
+    #                  <index  >, <type   >, <id>, <data>
+    req = client.index("twitter", "fizzle2", nil, {
+      "hello" => "world",
+      "number" => rand(5000)
+    })
+    req.execute
