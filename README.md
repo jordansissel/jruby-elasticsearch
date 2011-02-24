@@ -3,9 +3,15 @@ DSL Example ideas:
 
     client = ElasticSearch::Client.new
     req = client.index("twitter", "tweet") do
-      hello "world"
+      hello "world"     
       foo "bar"
     end
+
+    # The above will index this document:
+    # {
+    #   "hello": "world",
+    #   "foo": "bar"<
+    # }
 
     # Synchronous
     req.execute
