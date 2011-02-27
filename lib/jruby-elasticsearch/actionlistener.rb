@@ -20,6 +20,8 @@ class ElasticSearch::ActionListener
       @failure_callbacks << block
     when :success
       @success_callbacks << block
+    else
+      raise "Unknown event '#{what}' for #{self.class.name}"
     end
     return self
   end # def on
@@ -40,7 +42,7 @@ class ElasticSearch::ActionListener
       @success_callbacks.each { |c| c.call(response) }
     else
       # Default if no success callbacks
-      puts "#{self.class.name}#onResponse => #{response.inspect}"
+      puts "#{self.class.name}#onResponse => #{response.inspect} (#{self})"
     end
   end # def onResponse
 end # class ElasticSearch::ActionListener

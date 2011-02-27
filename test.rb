@@ -12,10 +12,10 @@ client = ElasticSearch::Client.new
 
 ## Simple method of indexing, using a dsl-like thingy:
 # The 'execute!' method is synchronous.
-client.index("twitter", "tweet") do
-  hello "world"
-  foo "bar"
-end.execute!
+#client.index("twitter", "tweet") do
+  #hello "world"
+  #foo "bar"
+#end.execute!
 
 ## More complex method of indexing.
 

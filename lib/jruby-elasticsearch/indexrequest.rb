@@ -11,7 +11,7 @@ class ElasticSearch::IndexRequest < ElasticSearch::Request
     @data = data
 
     @prep = @client.prepareIndex(index, type, id)
-    super
+    super()
   end
 
   # Execute this index request.

@@ -9,7 +9,9 @@ class ElasticSearch::Request
 
   # See ElasticSearch::ActionListener#on
   def on(event, &block)
-    return @handler.on(*args, &block)
+    puts "Event[#{event}] => #{block} (#{@handler})"
+    @handler.on(event, &block)
+    return self
   end
 
   # Execute this index request.

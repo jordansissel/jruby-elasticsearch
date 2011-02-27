@@ -1,4 +1,4 @@
-require "jruby/elasticsearch/client"
+require "jruby-elasticsearch/client"
 
 #class Proc
   #include java.lang.Runnable
