@@ -9,7 +9,7 @@ class ElasticSearch::Request
 
   # See ElasticSearch::ActionListener#on
   def on(event, &block)
-    puts "Event[#{event}] => #{block} (#{@handler})"
+    #puts "Event[#{event}] => #{block} (#{@handler})"
     @handler.on(event, &block)
     return self
   end
