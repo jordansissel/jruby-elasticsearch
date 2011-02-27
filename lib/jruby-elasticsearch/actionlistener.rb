@@ -1,5 +1,5 @@
 require "java"
-require "elasticsearch/namespace"
+require "jruby-elasticsearch/namespace"
 
 class ElasticSearch::ActionListener
   include org.elasticsearch.action.ActionListener

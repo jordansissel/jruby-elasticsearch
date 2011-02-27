@@ -4,7 +4,7 @@ Dir["/home/jls/build/elasticsearch-0.15.0//lib/*.jar"].each do |jar|
 end
 
 $:.unshift("lib")
-require "elasticsearch"
+require "jruby-elasticsearch"
 
 # Create a client which will find a nearby elasticsearch cluster using
 # the default discovery mechanism.

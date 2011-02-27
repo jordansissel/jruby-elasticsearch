@@ -1,7 +1,7 @@
-require "elasticsearch/namespace"
-require "elasticsearch/actionlistener"
+require "jruby-elasticsearch/namespace"
+require "jruby-elasticsearch/request"
 
-class ElasticSearch::IndexRequest
+class ElasticSearch::IndexRequest < ElasticSearch::Request
   # Create a new index request.
   def initialize(client, index, type, id=nil, data={})
     @client = client
@@ -9,13 +9,9 @@ class ElasticSearch::IndexRequest
     @type = type
     @id = id
     @data = data
-    @indexprep = @client.prepareIndex(index, type, id)
-    @handler = ElasticSearch::ActionListener.new
-  end
 
-  # See ElasticSearch::ActionListener#on
-  def on(event, &block)
-    return @handler.on(*args, &block)
+    @prep = @client.prepareIndex(index, type, id)
+    super
   end
 
   # Execute this index request.
@@ -23,20 +19,17 @@ class ElasticSearch::IndexRequest
   #
   # If a block is given, register it for both failure and success.
   def execute(&block)
-    @indexprep.setSource(@data)
-    if block_given?
-      on(:failure, &block)
-      on(:success, &block)
-    end
+    @prep.setSource(@data)
+    use_callback(&block) if block_given?
 
-    action = @indexprep.execute(@handler)
+    action = @prep.execute(@handler)
     return action
   end
 
   # Execute this index request synchronously
   def execute!
-    @indexprep.setSource(@data)
-    return @indexprep.execute.actionGet()
+    @prep.setSource(@data)
+    return @prep.execute.actionGet()
   end
 
   # DSL helper.
