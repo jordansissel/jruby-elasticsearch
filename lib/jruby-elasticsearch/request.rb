@@ -3,7 +3,7 @@ require "jruby-elasticsearch/actionlistener"
 
 class ElasticSearch::Request
   # Create a new index request.
-  def initialize()
+  def initialize
     @handler = ElasticSearch::ActionListener.new
   end
 
