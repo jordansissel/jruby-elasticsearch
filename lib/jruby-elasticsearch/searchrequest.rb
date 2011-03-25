@@ -6,9 +6,6 @@ class ElasticSearch::SearchRequest < ElasticSearch::Request
   def initialize(client)
     @client = client
     @prep = @client.prepareSearch("example")
-    qbuilder = org.elasticsearch.index.query.xcontent.QueryStringQueryBuilder.new("*")
-    @prep.setQuery(qbuilder)
-
     super()
   end
 
@@ -21,6 +18,10 @@ class ElasticSearch::SearchRequest < ElasticSearch::Request
   # org.elasticsearch.action.search.SearchResponse
   def execute(&block)
     use_callback(&block) if block_given?
+
+    # TODO(sissel): allow doing other queries and such.
+    qbuilder = org.elasticsearch.index.query.xcontent.QueryStringQueryBuilder.new("*")
+    @prep.setQuery(qbuilder)
 
     action = @prep.execute(@handler)
     return action
