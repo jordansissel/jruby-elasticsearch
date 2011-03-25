@@ -1,6 +1,7 @@
 require "java"
 require "jruby-elasticsearch/namespace"
 require "jruby-elasticsearch/indexrequest"
+require "jruby-elasticsearch/searchrequest"
 
 class ElasticSearch::Client
   def initialize
@@ -42,6 +43,14 @@ class ElasticSearch::Client
     end
     return indexreq
   end # def index
+
+  def search(&block)
+    searchreq = ElasticSearch::SearchRequest.new(@client)
+    if block_given?
+      searchreq.instance_eval(&block)
+    end
+    return searchreq
+  end # def search
 
   def cluster
     return @client.admin.cluster
