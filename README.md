@@ -61,12 +61,12 @@
 
 ## Searching
 
-    # Example 1
+    # Example 1, method chaining
     # Returns org.elasticsearch.action.search.SearchResponse
     # querys for "some query" and asks for 30 results
     client.search.query("some query").size(30).execute!
 
-    # Example 2
+    # Example 2, DSL
     client.search do
       query "some query"
 
