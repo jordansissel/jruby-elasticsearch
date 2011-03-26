@@ -44,10 +44,21 @@ class ElasticSearch::Client
     return indexreq
   end # def index
 
+  # Search for data.
+  # If a block is given, it is passed to SearchRequest#with so you can
+  # more easily configure the search, like so:
+  #
+  #   search = client.search("foo") do
+  #     query("*")
+  #     histogram("field", 1000)
+  #   end
+  #
+  #   The context of the block is of the SearchRequest object.
+  public
   def search(&block)
     searchreq = ElasticSearch::SearchRequest.new(@client)
     if block_given?
-      searchreq.instance_eval(&block)
+      searchreq.with(&block)
     end
     return searchreq
   end # def search
