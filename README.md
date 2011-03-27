@@ -58,3 +58,23 @@
     while !done
       sleep 1
     end
+
+## Searching
+
+    # Example 1, method chaining
+    # Returns org.elasticsearch.action.search.SearchResponse
+    # querys for "some query" and asks for 30 results
+    client.search.query("some query").size(30).execute!
+
+    # Example 2, DSL
+    client.search do
+      query "some query"
+
+      # histogram, bucketed by 10000
+      histogram "some field", 10000
+
+      # how many results
+      size 100
+    end.execute do |response|
+      # response == org.elasticsearch.action.search.SearchResponse
+    end
