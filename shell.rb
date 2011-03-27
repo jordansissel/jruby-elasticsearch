@@ -8,4 +8,5 @@ end
 
 $:.unshift("lib")
 
+require "rubygems"
 require "jruby-elasticsearch"
