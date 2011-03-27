@@ -4,8 +4,20 @@ require "jruby-elasticsearch/indexrequest"
 require "jruby-elasticsearch/searchrequest"
 
 class ElasticSearch::Client
-  def initialize
-    @node = org.elasticsearch.node.NodeBuilder.nodeBuilder.client(true).node
+  def initialize(options={})
+    builder = org.elasticsearch.node.NodeBuilder.nodeBuilder
+    builder.client(true)
+
+    if !options[:host].nil?
+      port = (options[:port] or "9200")
+      builder.settings.put("es.transport.tcp.port", port)
+    end
+
+    if !options[:cluster].nil?
+      builder.clusterName(options[:cluster])
+    end
+
+    @node = builder.node
     @client = @node.client
   end # def initialize
 

@@ -32,7 +32,10 @@ class ElasticSearch::SearchRequest < ElasticSearch::Request
   public
   def execute(&block)
     use_callback(&block) if block_given?
-    @prep.setIndices(@indeces) if !@indeces.empty?
+
+    #if !@indeces.empty?
+      @prep.setIndices(@indeces.to_java(:String))
+    #end
 
     action = @prep.execute(@handler)
     return action
@@ -60,9 +63,20 @@ class ElasticSearch::SearchRequest < ElasticSearch::Request
   end # def sort
 
   public
-  def query(query_string)
+  def query(query_string, default_operator=:and)
     # TODO(sissel): allow doing other queries and such.
     qbuilder = org.elasticsearch.index.query.xcontent.QueryStringQueryBuilder.new(query_string)
+
+    operator = org.elasticsearch.index.query.xcontent.QueryStringQueryBuilder::Operator
+    case default_operator
+      when :and
+        qbuilder.defaultOperator(operator::AND)
+      when :or
+        qbuilder.defaultOperator(operator::OR)
+      else
+        raise "Unknown default operator '#{default_operator.inspect}'"
+    end
+
     @prep.setQuery(qbuilder)
     return self
   end # def query
@@ -83,14 +97,19 @@ class ElasticSearch::SearchRequest < ElasticSearch::Request
   end # def histogram
 
   public
-  def limit(size)
-    @prep.setSize(size)
+  def size(s)
+    @prep.setSize(s)
     return self
   end
+  alias :count :size
+  alias :limit :size
 
   public
-  def offset(from)
+  def from(from)
     @prep.setFrom(from)
     return self
   end
+  alias :offset :from
+  alias :offset :from
+
 end # class ElasticSearch::SearchRequest
