@@ -14,8 +14,6 @@ class ElasticSearch::Client
     end
 
     if !options[:cluster].nil?
-      p "CLUSTER"
-      #builder.settings.put("es.cluster.name", options[:cluster])
       builder.clusterName(options[:cluster])
     end
 

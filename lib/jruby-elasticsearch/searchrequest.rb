@@ -32,7 +32,10 @@ class ElasticSearch::SearchRequest < ElasticSearch::Request
   public
   def execute(&block)
     use_callback(&block) if block_given?
-    @prep.setIndices(@indeces) if !@indeces.empty?
+
+    #if !@indeces.empty?
+      @prep.setIndices(@indeces.to_java(:String))
+    #end
 
     action = @prep.execute(@handler)
     return action
