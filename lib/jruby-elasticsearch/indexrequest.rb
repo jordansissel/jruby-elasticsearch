@@ -10,7 +10,12 @@ class ElasticSearch::IndexRequest < ElasticSearch::Request
     @id = id
     @data = data
 
-    @prep = @client.prepareIndex(index, type, id)
+    # This should silence jruby warnings for 'multiple java methods for prepareIndex'
+    if id.nil?
+      @prep = @client.prepareIndex(index, type)
+    else
+      @prep = @client.prepareIndex(index, type, id)
+    end
     super()
   end
 
