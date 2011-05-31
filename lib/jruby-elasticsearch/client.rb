@@ -16,6 +16,10 @@ class ElasticSearch::Client
       #builder.settings.put("es.transport.tcp.port", port)
     end
 
+    if options[:bind_host]
+      builder.settings.put('network.host', options[:bind_host])
+    end
+
     if !options[:cluster].nil?
       builder.clusterName(options[:cluster])
     end
