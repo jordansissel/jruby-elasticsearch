@@ -4,17 +4,30 @@ require "jruby-elasticsearch/indexrequest"
 require "jruby-elasticsearch/searchrequest"
 
 class ElasticSearch::Client
+
+  # Creates a new ElasticSearch client.
+  #
+  # options:
+  # :type => [:local, :node] - :local will create a process-local
+  #   elasticsearch instances
+  # :host => "hostname" - the hostname to connect to.
+  # :port => 9200 - the port to connect to
+  # :cluster => "clustername" - the cluster name to use
   def initialize(options={})
     builder = org.elasticsearch.node.NodeBuilder.nodeBuilder
     builder.client(true)
 
-    if !options[:host].nil?
-      port = (options[:port] or "9200")
-      builder.settings.put("es.transport.tcp.port", port)
-    end
+    if options[:type] == :local
+      builder.local(true)
+    else
+      if !options[:host].nil?
+        port = (options[:port] or "9200")
+        builder.settings.put("es.transport.tcp.port", port)
+      end
 
-    if !options[:cluster].nil?
-      builder.clusterName(options[:cluster])
+      if !options[:cluster].nil?
+        builder.clusterName(options[:cluster])
+      end
     end
 
     @node = builder.node
