@@ -20,9 +20,16 @@ class ElasticSearch::Client
     if options[:type] == :local
       builder.local(true)
     else
+      # Use unicast discovery a host is given
       if !options[:host].nil?
-        port = (options[:port] or "9200")
-        builder.settings.put("es.transport.tcp.port", port)
+        port = (options[:port] or "9300")
+        builder.settings.put("discovery.zen.ping.multicast.enabled", false)
+        builder.settings.put("discovery.zen.ping.unicast.hosts", "#{options[:host]}:#{port}")
+        #builder.settings.put("es.transport.tcp.port", port)
+      end
+
+      if options[:bind_host]
+        builder.settings.put('network.host', options[:bind_host])
       end
 
       if !options[:cluster].nil?

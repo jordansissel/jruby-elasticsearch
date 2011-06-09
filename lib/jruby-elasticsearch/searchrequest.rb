@@ -94,6 +94,19 @@ class ElasticSearch::SearchRequest < ElasticSearch::Request
   end # def histogram
 
   public
+  def terms(field, name=nil)
+    if name.nil?
+      # TODO(sissel): How do we expose the name of the histogram?
+      name = field
+    end
+    # TODO(sissel): Support 'global' ?
+    builder = org.elasticsearch.search.facet.terms.TermsFacetBuilder.new(name)
+    builder.field(field)
+    @prep.addFacet(builder)
+    return self
+  end # def terms
+
+  public
   def size(s)
     @prep.setSize(s)
     return self
