@@ -17,8 +17,16 @@ class ElasticSearch::Client
     builder = org.elasticsearch.node.NodeBuilder.nodeBuilder
     builder.client(true)
 
-    if options[:type] == :local
+    # The client doesn't need to serve http
+    builder.settings.put("http.enabled", false)
+
+    case options[:type]
+    when :local
       builder.local(true)
+      @node = builder.node
+      @client = @node.client
+    when :transport
+      # TODO(sissel): Support transport client
     else
       # Use unicast discovery a host is given
       if !options[:host].nil?
@@ -35,10 +43,10 @@ class ElasticSearch::Client
       if !options[:cluster].nil?
         builder.clusterName(options[:cluster])
       end
+      @node = builder.node
+      @client = @node.client
     end
 
-    @node = builder.node
-    @client = @node.client
   end # def initialize
 
   # Index a new document
