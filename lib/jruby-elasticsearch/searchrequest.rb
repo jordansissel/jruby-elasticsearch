@@ -2,6 +2,13 @@ require "jruby-elasticsearch/namespace"
 require "jruby-elasticsearch/request"
 
 class ElasticSearch::SearchRequest < ElasticSearch::Request
+  begin
+    QueryStringQueryBuilder = org.elasticsearch.index.query.xcontent.QueryStringQueryBuilder
+  rescue NameError
+    # The 'xcontent' namespace was removed in elasticsearch 0.17.0
+    QueryStringQueryBuilder = org.elasticsearch.index.query.QueryStringQueryBuilder
+  end
+
   # Create a new index request.
   public
   def initialize(client)
@@ -62,9 +69,9 @@ class ElasticSearch::SearchRequest < ElasticSearch::Request
   public
   def query(query_string, default_operator=:and)
     # TODO(sissel): allow doing other queries and such.
-    qbuilder = org.elasticsearch.index.query.xcontent.QueryStringQueryBuilder.new(query_string)
+    qbuilder = QueryStringQueryBuilder.new(query_string)
 
-    operator = org.elasticsearch.index.query.xcontent.QueryStringQueryBuilder::Operator
+    operator = QueryStringQueryBuilder::Operator
     case default_operator
       when :and
         qbuilder.defaultOperator(operator::AND)
