@@ -5,9 +5,8 @@ class ElasticSearch::BulkRequest < ElasticSearch::Request
   # Create a new index request.
   def initialize(client)
     @client = client
-
-    @prep = @client.prepareBulk(index, type, id)
-    super
+    @prep = @client.prepareBulk()
+    super()
   end
 
   # Execute this index request.
@@ -15,7 +14,7 @@ class ElasticSearch::BulkRequest < ElasticSearch::Request
   #
   # If a block is given, register it for both failure and success.
   def execute(&block)
-    use_callback(&block) if block_given
+    use_callback(&block) if block
     action = @prep.execute(@handler)
     return action
   end
@@ -23,6 +22,14 @@ class ElasticSearch::BulkRequest < ElasticSearch::Request
   # Execute this index request synchronously
   def execute!
     return @prep.execute.actionGet()
+  end
+
+  def index(index, type, id=nil, data={})
+    req = org.elasticsearch.action.index.IndexRequest.new(index)
+    req.type(type) if type
+    req.id(id.to_s) if id
+    req.source(data)
+    @prep.add(req)
   end
 
   def <<(request)

@@ -49,6 +49,10 @@ class ElasticSearch::Client
 
   end # def initialize
 
+  def bulk_index
+    ElasticSearch::BulkRequest.new(@client)
+  end
+
   # Index a new document
   #
   # args:
