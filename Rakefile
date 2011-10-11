@@ -1,4 +1,4 @@
-require 'tempfile'
+require 'rake/testtask'
 
 task :package do
   system("gem build jruby-elasticsearch.gemspec")
@@ -9,7 +9,8 @@ task :publish do
   system("gem push #{latest_gem}")
 end
 
-task :test do
-    system("cd test; ruby run.rb")
+Rake::TestTask.new do |t|
+  t.libs << "test"
+  t.test_files = FileList['test/test*.rb']
+  t.verbose = true
 end
-
