@@ -14,7 +14,7 @@ class ElasticSearch::BulkRequest < ElasticSearch::Request
   #
   # If a block is given, register it for both failure and success.
   def execute(&block)
-    use_callback(&block) if block
+    use_callback(&block) if block_given?
     action = @prep.execute(@handler)
     return action
   end
