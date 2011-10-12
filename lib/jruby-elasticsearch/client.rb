@@ -49,9 +49,12 @@ class ElasticSearch::Client
 
   end # def initialize
 
-  def bulk_index
+  # Get a new BulkRequest for sending multiple updates to elasticsearch in one
+  # request.
+  public
+  def bulk
     ElasticSearch::BulkRequest.new(@client)
-  end
+  end # def bulk
 
   # Index a new document
   #
