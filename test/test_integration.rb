@@ -47,7 +47,7 @@ class TestElasticSearch < Test::Unit::TestCase
 
   def test_bulk_index_asynchronously
     data = { "fizzle" => "dazzle", "pants" => "off" }
-    bulk = @client.bulk_index
+    bulk = @client.bulk
     bulk.index("twitter", "tweet1", data)
     bulk.index("twitter", "tweet2")
 
