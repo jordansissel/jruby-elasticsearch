@@ -3,7 +3,7 @@ require "test/unit"
 class TestElasticSearch < Test::Unit::TestCase
   def setup
     # Require all the elasticsearch libs
-    raise "Please set ELASTICSEARCH_HOME" if ENV['ELASTICSEARCH_HOME'] == ''
+    raise "Please set ELASTICSEARCH_HOME" if ENV['ELASTICSEARCH_HOME'].nil?
     Dir[File.join(ENV['ELASTICSEARCH_HOME'],"lib/*.jar")].each do |jar|
       require jar
     end
