@@ -4,11 +4,17 @@ class TestElasticSearch < Test::Unit::TestCase
   def setup
     # Require all the elasticsearch libs
     raise "Please set ELASTICSEARCH_HOME" if ENV['ELASTICSEARCH_HOME'].nil?
-    Dir[File.join(ENV['ELASTICSEARCH_HOME'],"lib/*.jar")].each do |jar|
+
+    dir = File.join(ENV["ELASTICSEARCH_HOME"], "lib")
+    if !File.directory?(dir)
+      raise "ELASTICSEARCH_HOME set, but #{dir} doesn't exist"
+    end
+
+    Dir.glob(File.join(dir, "*.jar")).each do |jar|
       require jar
     end
 
-    $:.unshift("lib")
+    $:.unshift(File.join(File.dirname(__FILE__), "..", "lib"))
     require "jruby-elasticsearch"
 
     # Start a local elasticsearch node
@@ -69,4 +75,34 @@ class TestElasticSearch < Test::Unit::TestCase
       sleep 1
     end
   end
-end
+
+  def test_bulk_stream_synchronous
+    stream = @client.bulkstream(10)
+    tries = 10
+    entries = 30
+    1.upto(entries) do |i|
+      stream.index("hello", "world", { "foo" => "bar", "i" => i })
+    end
+    stream.stop
+
+    found = false
+    1.upto(tries) do
+      search = @client.search do
+        index "hello"
+        query "*"
+      end
+      # Results is an org.elasticsearch.action.search.SearchResponse
+      results = search.execute!
+      count = results.hits.totalHits
+
+      if count == entries
+        # assert for good measure
+        found = true
+        break
+      end
+      sleep 0.2
+    end # try a bunch to find our results
+
+    assert(found, "Search results were not found.")
+  end # def test_bulk_stream_synchronous
+end # class TestElasticSearch

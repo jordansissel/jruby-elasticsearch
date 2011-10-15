@@ -42,6 +42,7 @@ class ElasticSearch::BulkStream
       end
 
       if @stop and @queue.size == 0
+        # Queue empty and it's time to stop.
         break
       end
     end # while true
@@ -50,6 +51,7 @@ class ElasticSearch::BulkStream
   # Stop the stream
   public
   def stop
+    @queue << nil
     @stop = true
   end # def stop
 
@@ -58,9 +60,18 @@ class ElasticSearch::BulkStream
   public
   def flush
     bulk = @client.bulk
-    1.upto(@queue.size) do |method, *args|
-      # calls bulk.index(*args) if method is index, etc...
+
+    flush_one = proc do
+      # block if no data.
+      method, *args = @queue.pop
+      return if args.nil? # probably we are now stopping.
       bulk.send(method, *args)
+    end
+
+    flush_one.call
+
+    1.upto([@queue.size, @queue_size - 1].min) do
+      flush_one.call
     end
 
     # Block until this finishes

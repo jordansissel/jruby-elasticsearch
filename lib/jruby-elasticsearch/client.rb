@@ -53,12 +53,12 @@ class ElasticSearch::Client
   # request.
   public
   def bulk
-    ElasticSearch::BulkRequest.new(@client)
+    return ElasticSearch::BulkRequest.new(@client)
   end # def bulk
 
   public
   def bulkstream(queue_size=10, flush_interval=1)
-    ElasticSearch::BulkStream.new(@client, queue_size, flush_interval)
+    return ElasticSearch::BulkStream.new(self, queue_size, flush_interval)
   end # def bulk
 
   # Index a new document
