@@ -1,0 +1,5 @@
+0.0.12 (2011-10-14)
+  * Implemented ElasticSearch::BulkStream
+
+0.0.11 and prior
+  I didn't track this stuff, sorry.
