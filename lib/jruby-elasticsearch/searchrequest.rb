@@ -13,7 +13,7 @@ class ElasticSearch::SearchRequest < ElasticSearch::Request
   public
   def initialize(client)
     @client = client
-    @prep = org.elasticsearch.client.action.search.SearchRequestBuilder.new(@client)
+    @prep = org.elasticsearch.action.search.SearchRequestBuilder.new(@client)
     @indeces = []
     super()
   end # def initialize
