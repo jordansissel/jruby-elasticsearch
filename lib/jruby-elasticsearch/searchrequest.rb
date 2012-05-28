@@ -13,7 +13,12 @@ class ElasticSearch::SearchRequest < ElasticSearch::Request
   public
   def initialize(client)
     @client = client
-    @prep = org.elasticsearch.client.action.search.SearchRequestBuilder.new(@client)
+    begin
+      @prep = org.elasticsearch.client.action.search.SearchRequestBuilder.new(@client)
+    rescue NameError
+      # The 'client' namespace was removed in elasticsearch 0.19.0
+      @prep = org.elasticsearch.action.search.SearchRequestBuilder.new(@client)
+    end
     @indeces = []
     super()
   end # def initialize
