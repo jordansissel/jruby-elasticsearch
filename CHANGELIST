@@ -1,3 +1,6 @@
+0.0.13 (2012-05-28)
+  * Support ElasticSearch 0.19.x
+
 0.0.12 (2011-10-14)
   * Implemented ElasticSearch::BulkStream
 
