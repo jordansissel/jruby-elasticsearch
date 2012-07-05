@@ -1,3 +1,7 @@
+0.0.14 (2012-??-??)
+  * Allow setting the ES node name by passing :node_name
+    to ElasticSearch::Client.
+
 0.0.13 (2012-05-28)
   * Support ElasticSearch 0.19.x
 

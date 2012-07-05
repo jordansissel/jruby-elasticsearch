@@ -13,6 +13,7 @@ class ElasticSearch::Client
   # :host => "hostname" - the hostname to connect to.
   # :port => 9200 - the port to connect to
   # :cluster => "clustername" - the cluster name to use
+  # :node_name => "node_name" - the node name to use when joining the cluster
   def initialize(options={})
     builder = org.elasticsearch.node.NodeBuilder.nodeBuilder
     builder.client(true)
@@ -38,6 +39,10 @@ class ElasticSearch::Client
 
       if options[:bind_host]
         builder.settings.put('network.host', options[:bind_host])
+      end
+
+      if options[:node_name]
+        builder.settings.put('node.name', options[:node_name])
       end
 
       if !options[:cluster].nil?
