@@ -1,7 +1,18 @@
-
 ## Start with it:
 
-    require "elasticsearch"
+Grab the latest ElasticSearch distribution, and unpack it. Set your CLASSPATH to include the *jar files in the /lib directory.
+
+Something like the following will accomplish this:
+
+    CLASSPATH=$(ls ./elasticsearch-0.20.6/lib/*.jar | tr '\n' ':')
+    
+To use from with Logstash source to get the appropriate jars for jruby-elasticsearch:
+
+    CLASSPATH=$(ls ./elasticsearch-0.20.6/lib/*.jar | tr '\n' ':') bin/logstash irb
+
+Then to use the library in your code:
+
+    require "jruby-elasticsearch"
     client = ElasticSearch::Client.new
 
 ## DSL Example
