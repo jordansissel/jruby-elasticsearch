@@ -33,8 +33,20 @@ class ElasticSearch::Client
       if !options[:host].nil?
         port = (options[:port] or "9300")
         builder.settings.put("discovery.zen.ping.multicast.enabled", false)
-        builder.settings.put("discovery.zen.ping.unicast.hosts", "#{options[:host]}:#{port}")
-        #builder.settings.put("es.transport.tcp.port", port)
+        if port =~ /^\d+-\d+$/
+          # port ranges are 'host[port1-port2]' according to 
+          # http://www.elasticsearch.org/guide/reference/modules/discovery/zen/
+          # However, it seems to only query the first port.
+          # So generate our own list of unicast hosts to scan.
+          range = Range.new(*port.split("-"))
+          hosts = range.collect { |p| "#{options[:host]}:#{p}" }.join(",")
+          builder.settings.put("discovery.zen.ping.unicast.hosts", hosts)
+        else
+          # only one port, not a range.
+          puts "PORT SETTINGS #{options[:host]}:#{port}"
+          builder.settings.put("discovery.zen.ping.unicast.hosts",
+                               "#{options[:host]}:#{port}")
+        end
       end
 
       if options[:bind_host]
