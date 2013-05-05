@@ -6,7 +6,7 @@ Gem::Specification.new do |spec|
   end
 
   spec.name = "jruby-elasticsearch"
-  spec.version = "0.0.14"
+  spec.version = "0.0.15"
   spec.summary = "JRuby API for ElasticSearch using the native ES Java API"
   spec.description = "..."
   spec.license = "Apache License (2.0)"
