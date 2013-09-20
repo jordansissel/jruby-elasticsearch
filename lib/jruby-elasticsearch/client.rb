@@ -53,6 +53,10 @@ class ElasticSearch::Client
         builder.settings.put('network.host', options[:bind_host])
       end
 
+      if options[:publish_host]
+        builder.settings.put('network.publish_host', options[:publish_host])
+      end
+
       if options[:node_name]
         builder.settings.put('node.name', options[:node_name])
       end
