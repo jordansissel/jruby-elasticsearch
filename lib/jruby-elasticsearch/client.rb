@@ -10,7 +10,8 @@ class ElasticSearch::Client
   # options:
   # :type => [:local, :node] - :local will create a process-local
   #   elasticsearch instances
-  # :host => "hostname" - the hostname to connect to.
+  # :host => "hostname" - the hostname to connect to. DEPRECATED: Use 'hosts' config parameter instead
+  # :hosts => ["hostname1", "hostname2"] - the hosts to connect to.
   # :port => 9200 - the port to connect to
   # :cluster => "clustername" - the cluster name to use
   # :node_name => "node_name" - the node name to use when joining the cluster
@@ -30,7 +31,8 @@ class ElasticSearch::Client
       # TODO(sissel): Support transport client
     else
       # Use unicast discovery a host is given
-      if !options[:host].nil?
+      if !(options[:host].nil? && options[:hosts].nil?)
+        all_hosts = options[:hosts] || [ options[:host] ]
         port = (options[:port] or "9300")
         builder.settings.put("discovery.zen.ping.multicast.enabled", false)
         if port =~ /^\d+-\d+$/
@@ -39,13 +41,13 @@ class ElasticSearch::Client
           # However, it seems to only query the first port.
           # So generate our own list of unicast hosts to scan.
           range = Range.new(*port.split("-"))
-          hosts = range.collect { |p| "#{options[:host]}:#{p}" }.join(",")
+          hosts = range.collect {|p| all_hosts.collect { |host| "#{host}:#{p}" }}.flatten.join(",")
           builder.settings.put("discovery.zen.ping.unicast.hosts", hosts)
         else
           # only one port, not a range.
-          puts "PORT SETTINGS #{options[:host]}:#{port}"
-          builder.settings.put("discovery.zen.ping.unicast.hosts",
-                               "#{options[:host]}:#{port}")
+          host_settings = all_hosts.collect{ |host| "#{host}:#{port}"}.join(",")
+          puts "PORT SETTINGS #{host_settings}"
+          builder.settings.put("discovery.zen.ping.unicast.hosts", host_settings)
         end
       end
 
