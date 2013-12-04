@@ -4,6 +4,8 @@ require "jruby-elasticsearch/indexrequest"
 require "jruby-elasticsearch/searchrequest"
 
 class ElasticSearch::Client
+  class Error < StandardError; end
+  class ConfigurationError < Error; end
 
   # Creates a new ElasticSearch client.
   #
@@ -15,55 +17,65 @@ class ElasticSearch::Client
   # :cluster => "clustername" - the cluster name to use
   # :node_name => "node_name" - the node name to use when joining the cluster
   def initialize(options={})
-    builder = org.elasticsearch.node.NodeBuilder.nodeBuilder
-    builder.client(true)
+    builder = org.elasticsearch.common.settings.ImmutableSettings.settingsBuilder
+    builder.put("node.client", true)
 
     # The client doesn't need to serve http
-    builder.settings.put("http.enabled", false)
+    builder.put("http.enabled", false)
 
-    case options[:type]
-    when :local
-      builder.local(true)
-      @node = builder.node
-      @client = @node.client
-    when :transport
-      # TODO(sissel): Support transport client
-    else
-      # Use unicast discovery a host is given
-      if !options[:host].nil?
-        port = (options[:port] or "9300")
-        builder.settings.put("discovery.zen.ping.multicast.enabled", false)
-        if port =~ /^\d+-\d+$/
-          # port ranges are 'host[port1-port2]' according to 
-          # http://www.elasticsearch.org/guide/reference/modules/discovery/zen/
-          # However, it seems to only query the first port.
-          # So generate our own list of unicast hosts to scan.
-          range = Range.new(*port.split("-"))
-          hosts = range.collect { |p| "#{options[:host]}:#{p}" }.join(",")
-          builder.settings.put("discovery.zen.ping.unicast.hosts", hosts)
-        else
-          # only one port, not a range.
-          puts "PORT SETTINGS #{options[:host]}:#{port}"
-          builder.settings.put("discovery.zen.ping.unicast.hosts",
-                               "#{options[:host]}:#{port}")
-        end
+    # Use unicast discovery a host is given
+    if !options[:host].nil?
+      port = (options[:port] or "9300")
+      builder.put("discovery.zen.ping.multicast.enabled", false)
+      if port =~ /^\d+-\d+$/
+        # port ranges are 'host[port1-port2]' according to 
+        # http://www.elasticsearch.org/guide/reference/modules/discovery/zen/
+        # However, it seems to only query the first port.
+        # So generate our own list of unicast hosts to scan.
+        range = Range.new(*port.split("-"))
+        hosts = range.collect { |p| "#{options[:host]}:#{p}" }.join(",")
+        builder.put("discovery.zen.ping.unicast.hosts", hosts)
+      else
+        # only one port, not a range.
+        puts "PORT SETTINGS #{options[:host]}:#{port}"
+        builder.put("discovery.zen.ping.unicast.hosts",
+                             "#{options[:host]}:#{port}")
       end
-
-      if options[:bind_host]
-        builder.settings.put('network.host', options[:bind_host])
-      end
-
-      if options[:node_name]
-        builder.settings.put('node.name', options[:node_name])
-      end
-
-      if !options[:cluster].nil?
-        builder.clusterName(options[:cluster])
-      end
-      @node = builder.node
-      @client = @node.client
     end
 
+    if options[:bind_host]
+      builder.put('network.host', options[:bind_host])
+    end
+
+    if options[:bind_port]
+      builder.put('transport.tcp.port', options[:bind_port])
+    end
+
+    if options[:node_name]
+      builder.put('node.name', options[:node_name])
+    end
+
+    if !options[:cluster].nil?
+      builder.put('cluster.name', options[:cluster])
+    end
+
+    p :settings => builder.build.getAsMap
+    case options[:type]
+      when :transport 
+        @client = org.elasticsearch.client.transport.TransportClient.new(builder.build)
+        if options[:host]
+          @client.addTransportAddress(
+            org.elasticsearch.common.transport.InetSocketTransportAddress.new(
+              options[:host], options[:port] || 9300
+            )
+          )
+        else
+          raise ConfigurationError, "When using a transport client, you must give a :host setting to ElasticSearch::Client.new. Otherwise, I don't know what elasticsearch servers talk to."
+        end
+      else
+        nodebuilder = org.elasticsearch.node.NodeBuilder.nodeBuilder
+        @client = nodebuilder.settings(builder).node.client
+    end
   end # def initialize
 
   # Get a new BulkRequest for sending multiple updates to elasticsearch in one
