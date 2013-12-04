@@ -59,7 +59,6 @@ class ElasticSearch::Client
       builder.put('cluster.name', options[:cluster])
     end
 
-    p :settings => builder.build.getAsMap
     case options[:type]
       when :transport 
         @client = org.elasticsearch.client.transport.TransportClient.new(builder.build)
