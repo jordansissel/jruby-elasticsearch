@@ -9,7 +9,7 @@ class ElasticSearch::DeleteIndexTemplateRequest < ElasticSearch::Request
     @client = client
     @template_name = template_name
     begin
-      @prep = org.elasticsearch.action.admin.indices.template.delete.DeleteIndexTemplatesRequestBuilder.new(@client, @template_name)
+      @prep = org.elasticsearch.action.admin.indices.template.delete.DeleteIndexTemplateRequestBuilder.new(@client.admin().indices(), @template_name)
     rescue NameError
       puts "Could not create DeleteIndexTemplateRequestBuilder", NameError.to_s
     end
@@ -23,7 +23,7 @@ class ElasticSearch::DeleteIndexTemplateRequest < ElasticSearch::Request
   end # def with
 
   # Execute this request.
-  # This call is asynchronous.
+  # This call is synchronous.
   #
   # If a block is given, register it for both failure and success.
   #
@@ -32,13 +32,13 @@ class ElasticSearch::DeleteIndexTemplateRequest < ElasticSearch::Request
   public
   def execute(&block)
     use_callback(&block) if block_given?
-    action = @prep.execute(@handler)
+    action = @prep.get
     return action
   end # def execute
 
 end # class ElasticSearch::DeleteIndexTemplateRequest
 
-class ElasticSearch::GetIndexTemplateRequest < ElasticSearch::Request
+class ElasticSearch::GetIndexTemplatesRequest < ElasticSearch::Request
 
   # Create a new GetIndexTemplateRequest request.
   public
@@ -47,7 +47,7 @@ class ElasticSearch::GetIndexTemplateRequest < ElasticSearch::Request
     @template_name = template_name
     puts "Template name passed: " + @template_name
     begin
-      @prep = org.elasticsearch.action.admin.indices.template.get.GetIndexTemplatesRequestBuilder.new(@client, @template_name)
+      @prep = org.elasticsearch.action.admin.indices.template.get.GetIndexTemplatesRequestBuilder.new(@client.admin().indices(), @template_name)
     rescue NameError
       puts "Could not create GetIndexTemplateRequestBuilder.  Error => " + NameError.to_s
     end
@@ -61,7 +61,7 @@ class ElasticSearch::GetIndexTemplateRequest < ElasticSearch::Request
   end # def with
 
   # Execute this request.
-  # This call is asynchronous.
+  # This call is synchronous.
   #
   # If a block is given, register it for both failure and success.
   #
@@ -70,7 +70,7 @@ class ElasticSearch::GetIndexTemplateRequest < ElasticSearch::Request
   public
   def execute(&block)
     use_callback(&block) if block_given?
-    action = @prep.execute(@handler)
+    action = @prep.get
     return action
   end # def execute
 
@@ -85,13 +85,13 @@ class ElasticSearch::PutIndexTemplateRequest < ElasticSearch::Request
     @template_name = template_name
     @mapping_json = mapping_json
     begin
-      @prep = org.elasticsearch.action.admin.indices.template.put.PutIndexTemplatesRequestBuilder.new(@client, @template_name)
+      @prep = org.elasticsearch.action.admin.indices.template.put.PutIndexTemplateRequestBuilder.new(@client.admin().indices(), @template_name)
     rescue NameError
       puts "Could not create PutIndexTemplateRequestBuilder", NameError.to_s
     end
     super()
     # Assign the template
-    @prep.setSettings(@mapping_json)
+    @prep.setSource(@mapping_json)
   end # def initialize
 
   public
@@ -101,7 +101,7 @@ class ElasticSearch::PutIndexTemplateRequest < ElasticSearch::Request
   end # def with
 
   # Execute this request.
-  # This call is asynchronous.
+  # This call is synchronous.
   #
   # If a block is given, register it for both failure and success.
   #
@@ -110,7 +110,7 @@ class ElasticSearch::PutIndexTemplateRequest < ElasticSearch::Request
   public
   def execute(&block)
     use_callback(&block) if block_given?
-    action = @prep.execute(@handler)
+    action = @prep.get
     return action
   end # def execute
 
