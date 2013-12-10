@@ -9,9 +9,9 @@ class ElasticSearch::DeleteIndexTemplateRequest < ElasticSearch::Request
     @client = client
     @template_name = template_name
     begin
-      @prep = org.elasticsearch.action.admin.indices.template.delete.DeleteIndexTemplateRequestBuilder.new(@client, @template_name)
+      @prep = org.elasticsearch.action.admin.indices.template.delete.DeleteIndexTemplatesRequestBuilder.new(@client, @template_name)
     rescue NameError
-      @logger.error("Could not create DeleteIndexTemplateRequestBuilder", :name_error => NameError.to_s)
+      puts "Could not create DeleteIndexTemplateRequestBuilder", NameError.to_s
     end
     super()
   end # def initialize
@@ -32,7 +32,7 @@ class ElasticSearch::DeleteIndexTemplateRequest < ElasticSearch::Request
   public
   def execute(&block)
     use_callback(&block) if block_given?
-    action = @prep.doExecute(@handler)
+    action = @prep.execute(@handler)
     return action
   end # def execute
 
@@ -45,10 +45,11 @@ class ElasticSearch::GetIndexTemplateRequest < ElasticSearch::Request
   def initialize(client, template_name)
     @client = client
     @template_name = template_name
+    puts "Template name passed: " + @template_name
     begin
-      @prep = org.elasticsearch.action.admin.indices.template.get.GetIndexTemplateRequestBuilder.new(@client, @template_name)
+      @prep = org.elasticsearch.action.admin.indices.template.get.GetIndexTemplatesRequestBuilder.new(@client, @template_name)
     rescue NameError
-      @logger.error("Could not create GetIndexTemplateRequestBuilder", :name_error => NameError.to_s)
+      puts "Could not create GetIndexTemplateRequestBuilder.  Error => " + NameError.to_s
     end
     super()
   end # def initialize
@@ -69,7 +70,7 @@ class ElasticSearch::GetIndexTemplateRequest < ElasticSearch::Request
   public
   def execute(&block)
     use_callback(&block) if block_given?
-    action = @prep.doExecute(@handler)
+    action = @prep.execute(@handler)
     return action
   end # def execute
 
@@ -84,9 +85,9 @@ class ElasticSearch::PutIndexTemplateRequest < ElasticSearch::Request
     @template_name = template_name
     @mapping_json = mapping_json
     begin
-      @prep = org.elasticsearch.action.admin.indices.template.put.PutIndexTemplateRequestBuilder.new(@client, @template_name)
+      @prep = org.elasticsearch.action.admin.indices.template.put.PutIndexTemplatesRequestBuilder.new(@client, @template_name)
     rescue NameError
-      @logger.error("Could not create PutIndexTemplateRequestBuilder", :name_error => NameError.to_s)
+      puts "Could not create PutIndexTemplateRequestBuilder", NameError.to_s
     end
     super()
     # Assign the template
@@ -109,7 +110,7 @@ class ElasticSearch::PutIndexTemplateRequest < ElasticSearch::Request
   public
   def execute(&block)
     use_callback(&block) if block_given?
-    action = @prep.doExecute(@handler)
+    action = @prep.execute(@handler)
     return action
   end # def execute
 
