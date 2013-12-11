@@ -45,7 +45,6 @@ class ElasticSearch::GetIndexTemplatesRequest < ElasticSearch::Request
   def initialize(client, template_name)
     @client = client
     @template_name = template_name
-    puts "Template name passed: " + @template_name
     begin
       @prep = org.elasticsearch.action.admin.indices.template.get.GetIndexTemplatesRequestBuilder.new(@client.admin().indices(), @template_name)
     rescue NameError
