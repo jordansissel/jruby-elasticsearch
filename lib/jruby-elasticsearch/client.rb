@@ -2,6 +2,7 @@ require "java"
 require "jruby-elasticsearch/namespace"
 require "jruby-elasticsearch/indexrequest"
 require "jruby-elasticsearch/searchrequest"
+require "jruby-elasticsearch/templaterequest"
 
 class ElasticSearch::Client
   class Error < StandardError; end
